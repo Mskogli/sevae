@@ -46,6 +46,12 @@ class VAENetworkInterface:
             1000 * (self.end_time - self.start_time),
         )
 
+    def forward_torch(self, images):
+        with torch.no_grad():
+            clamped_images = torch.clamp(images, 0.0, 1.0)
+            z_sampled, means, *_ = self.vae.encode(clamped_images.view(-1, 1, 270, 480))
+        return means
+
     def decode(self, latent):
         with torch.no_grad():
             reconstructed_image = self.vae.decode(latent).cpu().numpy()
